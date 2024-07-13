@@ -190,6 +190,10 @@ func (s *Storage) checkSchema(tableName string) {
 
 	row := s.db.QueryRow(context.Background(), fmt.Sprintf(checkSchemaQuery, tableName))
 	if err := row.Scan(&data); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			fmt.Printf("No rows found for table %s. Ensure the table exists and the column 'v' is correctly defined.\n", tableName)
+			return
+		}
 		panic(err)
 	}
 
